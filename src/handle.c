@@ -1,6 +1,6 @@
+#include <bfd.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <bfd.h>
 
 #include "general.h"
 

@@ -8,20 +8,23 @@
 #include "binary.h"
 #include "general.h"
 #include "handle.h"
+#include "symbol.h"
 
 int main(int argc, char *argv[]) {
 
 	int option;
-	char *file;
-	int file_set = false;
+	char *binary;
+	bool binary_set = false;
+	bool symbols_set = false;
 
-	struct Binary *binary;
-
-	while ((option = getopt(argc, argv, ":f:")) != -1) {
+	while ((option = getopt(argc, argv, ":f:s")) != -1) {
 		switch (option) {
 		case 'f':
-			file = optarg;
-			file_set = true;
+			binary = optarg;
+			binary_set = true;
+			break;
+		case 's':
+			symbols_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -41,20 +44,18 @@ int main(int argc, char *argv[]) {
 			usage(argv);
 		}
 	}
-	if (!file_set)
+	if (!binary_set)
 		usage(argv);
 
-	binary = parsed_binary(
-		validated_handle(
-			raw_handle(file)
-		),
-		file
-	);
+	bfd *handle = validated_handle(raw_handle(binary));
+	print_binary(parsed_binary(handle, binary));
 
-	printf("Entry point address: %ld\n", binary->entry);
-	printf("Binary format:       %s\n", binary->printable_format);
-	printf("Binary architecture: %s\n", binary->printable_architecture);
-			
+	if (symbols_set) {
+		struct Symbol *symbols = NULL;
+		long count = parsed_symbols(handle, &symbols);
+		print_symbols(symbols, count);
+	}
+
 	exit(EXIT_SUCCESS);
 }
 

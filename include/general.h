@@ -5,3 +5,4 @@ void error(char *message);
 void usage(char *argv[]);
 
 #endif
+

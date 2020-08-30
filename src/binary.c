@@ -1,6 +1,7 @@
+#include <bfd.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <bfd.h>
 
 #include "binary.h"
 #include "general.h"
@@ -44,5 +45,11 @@ struct Binary *parsed_binary(bfd *handle, char *file) {
 	}
 
 	return binary;
+}
+
+void print_binary(struct Binary *binary) {
+	printf("Entry point address: %ld\n", binary->entry);
+	printf("Binary format:       %s\n", binary->printable_format);
+	printf("Binary architecture: %s\n", binary->printable_architecture);
 }
 
