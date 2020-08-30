@@ -48,7 +48,7 @@ struct Binary *parsed_binary(bfd *handle, char *file) {
 }
 
 void print_binary(struct Binary *binary) {
-	printf("Entry point address: %ld\n", binary->entry);
+	printf("Entry point address: 0x%016jx\n", binary->entry);
 	printf("Binary format:       %s\n", binary->printable_format);
 	printf("Binary architecture: %s\n", binary->printable_architecture);
 }

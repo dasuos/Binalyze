@@ -24,6 +24,8 @@ long parsed_symbols(bfd *handle, struct Symbol **reference) {
 
 		//allocate and initialize Symbol structures
 		struct Symbol *symbols = malloc(count * sizeof(struct Symbol));
+		if (symbols == NULL)
+			error("No memory can be allocated");
 		for (i = 0, j = 0; i < count; i++) {
 			//initialize function symbol only
 			if (table[i]->flags & BSF_FUNCTION) {
@@ -43,11 +45,15 @@ long parsed_symbols(bfd *handle, struct Symbol **reference) {
 }
 
 void print_symbols(struct Symbol *symbols, long count) {
-	if (count > 0)
-		printf("Static symbol table:\n\n");
-	for (long i = 0; i < count; i++) {
-		printf("    Symbol name:    %s\n", symbols[i].name);
-		printf("    Symbol address: %ld\n\n", symbols[i].address);
+	if (count > 0) {
+		printf("Static symbol table:\n");
+		for (long i = 0; i < count; i++) {
+			printf(
+				"    %-40s 0x%016jx Function\n", 
+				symbols[i].name,
+				symbols[i].address
+			);
+		}
 	}
 }
 
