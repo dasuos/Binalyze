@@ -7,25 +7,51 @@
 #include "symbol.h"
 #include "general.h"
 
-long parsed_symbols(bfd *handle, struct Symbol **reference) {
+static int upper_bound(bfd *handle, enum SymbolTable type) {
+	switch(type) {
+	case Static:
+		return bfd_get_symtab_upper_bound(handle);
+	case Dynamic:
+		return bfd_get_dynamic_symtab_upper_bound(handle);
+	default:
+		return 0;
+	}
+}
+
+static long canonicalize(bfd *handle, asymbol **table, enum SymbolTable type) {
+	switch(type) {
+	case Static:
+		return bfd_canonicalize_symtab(handle, table);
+	case Dynamic:
+		return bfd_canonicalize_dynamic_symtab(handle, table);
+	default:
+		return 0;
+	}
+}
+
+long parsed_symbols(
+	bfd *handle, 
+	struct Symbol **reference,
+	enum SymbolTable type
+) {
 
 	long count, i, j;
 
-	int bytes = bfd_get_symtab_upper_bound(handle);
+	int bytes = upper_bound(handle, type);
 	if (bytes > 0) {
 
 		//read .symtab section and allocate symbol table
 		asymbol **table = (asymbol**) malloc(bytes);
 		if (table == NULL)
-			error("No memory can be allocated");
-		count = bfd_canonicalize_symtab(handle, table);
+			error("No memory can be allocated\n");
+		count = canonicalize(handle, table, type);
 		if (count < 0)
-			error("Unable to read .symtab section");
+			error("Unable to read symbol table\n");
 
 		//allocate and initialize Symbol structures
 		struct Symbol *symbols = malloc(count * sizeof(struct Symbol));
 		if (symbols == NULL)
-			error("No memory can be allocated");
+			error("No memory can be allocated\n");
 		for (i = 0, j = 0; i < count; i++) {
 			//initialize function symbol only
 			if (table[i]->flags & BSF_FUNCTION) {
@@ -39,14 +65,17 @@ long parsed_symbols(bfd *handle, struct Symbol **reference) {
 		*reference = symbols;
 
 	} else if (bytes < 0)
-		error("Unable to read .symtab section");
+		error("Unable to read symbol table\n");
 
 	return count;
 }
 
-void print_symbols(struct Symbol *symbols, long count) {
+void print_symbols(struct Symbol *symbols, long count, enum SymbolTable type) {
 	if (count > 0) {
-		printf("Static symbol table:\n");
+		printf(
+			"%s symbol table:\n", 
+			type == Static ? "Static" : "Dynamic"
+		);
 		for (long i = 0; i < count; i++) {
 			printf(
 				"    %-40s 0x%016jx Function\n", 

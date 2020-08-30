@@ -16,8 +16,12 @@ int main(int argc, char *argv[]) {
 	char *binary;
 	bool binary_set = false;
 	bool symbols_set = false;
+	bool dynamic_symbols_set = false;
 
-	while ((option = getopt(argc, argv, ":f:s")) != -1) {
+	struct Symbol *symbols = NULL;
+	long symbol_count;
+
+	while ((option = getopt(argc, argv, ":f:sd")) != -1) {
 		switch (option) {
 		case 'f':
 			binary = optarg;
@@ -25,6 +29,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 's':
 			symbols_set = true;
+			break;
+		case 'd':
+			dynamic_symbols_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -51,9 +58,13 @@ int main(int argc, char *argv[]) {
 	print_binary(parsed_binary(handle, binary));
 
 	if (symbols_set) {
-		struct Symbol *symbols = NULL;
-		long count = parsed_symbols(handle, &symbols);
-		print_symbols(symbols, count);
+		symbol_count = parsed_symbols(handle, &symbols, Static);
+		print_symbols(symbols, symbol_count, Static);
+	}
+
+	if (dynamic_symbols_set) {
+		symbol_count = parsed_symbols(handle, &symbols, Dynamic);
+		print_symbols(symbols, symbol_count, Dynamic);
 	}
 
 	exit(EXIT_SUCCESS);
