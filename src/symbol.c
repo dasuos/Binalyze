@@ -6,8 +6,8 @@
 #include "symbol.h"
 #include "general.h"
 
-static int upper_bound(bfd *handle, enum SymbolTable type) {
-	switch(type) {
+static int upper_bound(bfd *handle, enum SymbolTable table_type) {
+	switch(table_type) {
 	case Static:
 		return bfd_get_symtab_upper_bound(handle);
 	case Dynamic:
@@ -17,8 +17,12 @@ static int upper_bound(bfd *handle, enum SymbolTable type) {
 	}
 }
 
-static long canonicalize(bfd *handle, asymbol **table, enum SymbolTable type) {
-	switch(type) {
+static long canonicalize(
+	bfd *handle, 
+	asymbol **table, 
+	enum SymbolTable table_type
+) {
+	switch(table_type) {
 	case Static:
 		return bfd_canonicalize_symtab(handle, table);
 	case Dynamic:
@@ -31,19 +35,20 @@ static long canonicalize(bfd *handle, asymbol **table, enum SymbolTable type) {
 long parsed_symbols(
 	bfd *handle, 
 	struct Symbol **reference,
-	enum SymbolTable type
+	enum SymbolTable table_type
 ) {
 
 	long count, i, j;
+	enum SymbolType symbol_type;
 
-	int bytes = upper_bound(handle, type);
+	int bytes = upper_bound(handle, table_type);
 	if (bytes > 0) {
 
 		//read .symtab section and allocate symbol table
 		asymbol **table = (asymbol**) malloc(bytes);
 		if (table == NULL)
 			error("No memory can be allocated\n");
-		count = canonicalize(handle, table, type);
+		count = canonicalize(handle, table, table_type);
 		if (count < 0)
 			error("Unable to read symbol table\n");
 
@@ -52,16 +57,26 @@ long parsed_symbols(
 		if (symbols == NULL)
 			error("No memory can be allocated\n");
 
-		//parse symbol type, name and address
 		for (i = 0, j = 0; i < count; i++) {
-			//initialize function symbol only
-			if (table[i]->flags & BSF_FUNCTION) {
-				symbols[j].type = Function;
-				symbols[j].name = table[i]->name;
-				symbols[j].address = bfd_asymbol_value(table[i]);
-				j++;
-			}
+			
+			//allow function and data symbols only
+			if (table[i]->flags & BSF_FUNCTION)
+				symbol_type = Function;
+			else if (table[i]->flags & BSF_LOCAL)
+				symbol_type = Local;
+			else if (table[i]->flags & BSF_GLOBAL)
+				symbol_type = Global;
+			else
+				continue;
+		
+			//parse symbol type, name and address
+			symbols[j].type = symbol_type;
+			symbols[j].name = table[i]->name;
+			symbols[j].address = bfd_asymbol_value(table[i]);
+
+			j++;
 		}
+		
 		count = j;
 		*reference = symbols;
 
@@ -71,17 +86,37 @@ long parsed_symbols(
 	return count;
 }
 
-void print_symbols(struct Symbol *symbols, long count, enum SymbolTable type) {
+void print_symbols(
+	struct Symbol *symbols, 
+	long count, 
+	enum SymbolTable table_type
+) {
+
+	char *symbol_type;
+
 	if (count > 0) {
 		printf(
 			"%s symbol table:\n", 
-			type == Static ? "Static" : "Dynamic"
+			table_type == Static ? "Static" : "Dynamic"
 		);
 		for (long i = 0; i < count; i++) {
+			switch(symbols[i].type) {
+			case Function:
+				symbol_type = "Function";
+				break;
+			case Local:
+				symbol_type = "Local";
+				break;
+			default:
+				symbol_type = "Global";
+				break;
+			}
+
 			printf(
-				"    %-35s 0x%016jx Function\n", 
+				"    %-40s 0x%016jx %s\n", 
 				symbols[i].name,
-				symbols[i].address
+				symbols[i].address,
+				symbol_type
 			);
 		}
 	}

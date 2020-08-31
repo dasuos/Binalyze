@@ -74,7 +74,7 @@ void print_sections(struct Section *sections, long count) {
 		printf("Sections:\n");
 		for (long i = 0; i < count; i++)
 			printf(
-				"    %-35s 0x%016jx %-8ju %s\n",
+				"    %-40s 0x%016jx %-8ju %s\n",
 				sections[i].name,
 				sections[i].virtual_address,
 				sections[i].size,
