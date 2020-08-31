@@ -78,7 +78,7 @@ void print_symbols(struct Symbol *symbols, long count, enum SymbolTable type) {
 		);
 		for (long i = 0; i < count; i++) {
 			printf(
-				"    %-40s 0x%016jx Function\n", 
+				"    %-35s 0x%016jx Function\n", 
 				symbols[i].name,
 				symbols[i].address
 			);

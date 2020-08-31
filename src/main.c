@@ -9,19 +9,24 @@
 #include "general.h"
 #include "handle.h"
 #include "symbol.h"
+#include "section.h"
 
 int main(int argc, char *argv[]) {
 
 	int option;
 	char *binary;
-	bool binary_set = false;
-	bool symbols_set = false;
-	bool dynamic_symbols_set = false;
+
+	bool binary_set,
+	     symbols_set,
+	     dynamic_symbols_set, 
+	     sections_set = false;
 
 	struct Symbol *symbols = NULL;
-	long symbol_count;
+	struct Section *sections = NULL;
+	long symbol_count,
+	     section_count;
 
-	while ((option = getopt(argc, argv, ":f:sd")) != -1) {
+	while ((option = getopt(argc, argv, ":f:osd")) != -1) {
 		switch (option) {
 		case 'f':
 			binary = optarg;
@@ -32,6 +37,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'd':
 			dynamic_symbols_set = true;
+			break;
+		case 'o':
+			sections_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -65,6 +73,11 @@ int main(int argc, char *argv[]) {
 	if (dynamic_symbols_set) {
 		symbol_count = parsed_symbols(handle, &symbols, Dynamic);
 		print_symbols(symbols, symbol_count, Dynamic);
+	}
+
+	if (sections_set) {
+		section_count = parsed_sections(handle, &sections);
+		print_sections(sections, section_count);
 	}
 
 	exit(EXIT_SUCCESS);

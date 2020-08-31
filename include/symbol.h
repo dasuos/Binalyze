@@ -7,7 +7,7 @@ enum SymbolTable {Static = 0, Dynamic = 1};
 
 struct Symbol {
 
-	enum Type {Unknown = 0, Function = 1} type;
+	enum Type {ForbiddenSymbol = 0, Function = 1} type;
 	char const *name;
 	uint64_t address;
 };
