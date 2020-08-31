@@ -1,8 +1,7 @@
 #include <bfd.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#include <stdio.h>
 
 #include "symbol.h"
 #include "general.h"
