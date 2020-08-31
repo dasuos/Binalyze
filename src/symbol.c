@@ -48,10 +48,12 @@ long parsed_symbols(
 		if (count < 0)
 			error("Unable to read symbol table\n");
 
-		//allocate and initialize Symbol structures
+		//allocate Symbol structures
 		struct Symbol *symbols = malloc(count * sizeof(struct Symbol));
 		if (symbols == NULL)
 			error("No memory can be allocated\n");
+
+		//parse symbol type, name and address
 		for (i = 0, j = 0; i < count; i++) {
 			//initialize function symbol only
 			if (table[i]->flags & BSF_FUNCTION) {
