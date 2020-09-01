@@ -16,6 +16,12 @@ struct Section {
 
 long parsed_sections(bfd *handle, struct Section **reference);
 void print_sections(struct Section *sections, long count);
+struct Section parsed_section(
+	struct Section *sections, 
+	long count,
+	char *name
+);
+void print_section(struct Section section);
 
 #endif
 

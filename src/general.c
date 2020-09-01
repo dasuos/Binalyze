@@ -4,7 +4,7 @@
 
 void error(char *message) {
 	
-	perror(message);
+	fputs(message, stderr);
 	exit(EXIT_FAILURE);
 }
 

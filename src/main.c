@@ -14,32 +14,36 @@
 int main(int argc, char *argv[]) {
 
 	int option;
-	char *binary;
+	char *binary, *section;
 
 	bool binary_set,
 	     symbols_set,
 	     dynamic_symbols_set, 
-	     sections_set = false;
+	     sections_set,
+	     section_content_set = false;
 
 	struct Symbol *symbols = NULL;
 	struct Section *sections = NULL;
-	long symbol_count,
-	     section_count;
+	long symbol_count, section_count;
 
-	while ((option = getopt(argc, argv, ":f:osd")) != -1) {
+	while ((option = getopt(argc, argv, ":f:c:ods")) != -1) {
 		switch (option) {
 		case 'f':
 			binary = optarg;
 			binary_set = true;
 			break;
-		case 's':
+		case 'o':
 			symbols_set = true;
 			break;
 		case 'd':
 			dynamic_symbols_set = true;
 			break;
-		case 'o':
+		case 's':
 			sections_set = true;
+			break;
+		case 'c':
+			section = optarg;
+			section_content_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -63,6 +67,19 @@ int main(int argc, char *argv[]) {
 		usage(argv);
 
 	bfd *handle = validated_handle(raw_handle(binary));
+
+	if (section_content_set) {
+		section_count = parsed_sections(handle, &sections);
+		print_section(
+			parsed_section(
+				sections,
+				section_count,
+				section
+			)
+		);
+		exit(EXIT_SUCCESS);
+	}
+
 	print_binary(parsed_binary(handle, binary));
 
 	if (symbols_set) {
