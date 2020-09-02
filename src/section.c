@@ -136,7 +136,8 @@ void print_section(struct Section section) {
 	);
 
 	for (int i = 0; i < section.size; i++) {
-		//print line ASCII values
+		
+		//print ASCII values
 		if ((i % 16) == 0 && i != 0)
 			for (j = (i - 16); j < i; j++)
 				print_ascii(section.contents[j]);
@@ -145,10 +146,11 @@ void print_section(struct Section section) {
 			printf("\n%08jx: ", address);
 			address += 16;		
 		}
-		//print line hexadecimal characters
+		//print hexadecimal characters
 		printf("%02x", section.contents[i]);
 		if ((i % 2) == 1)
 			printf(" ");
+		
 		//print ASCII values with padding of last line
 		if (i == section.size - 1) {
 			print_padding(section.size);
