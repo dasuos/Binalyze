@@ -1,5 +1,5 @@
 # Binalyze
-Binary analysis tool using libbfd and Capstone API (version 4.0.2)
+Binary analysis tool using libbfd and Capstone API version 4.0.2  
 (https://www.capstone-engine.org/)
 
 Usage: **./binalyze -f binary [-c section] [-odsl]**
