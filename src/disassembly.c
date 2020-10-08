@@ -1,10 +1,15 @@
 #include <stdio.h>
-#include  <capstone/capstone.h>
+#include <capstone/capstone.h>
 
 #include "general.h"
+#include "binary.h"
 #include "section.h"
 
-void print_linear_disassembly(struct Section *sections, long section_count) {
+void print_linear_disassembly(
+	struct Binary *binary,
+	struct Section *sections, 
+	long section_count
+) {
 
 	csh handle;
 	cs_insn *instructions;
@@ -18,7 +23,7 @@ void print_linear_disassembly(struct Section *sections, long section_count) {
 	);
 
 	//open Capstone instance and disassemble
-	if (cs_open(CS_ARCH_X86, CS_MODE_64, &handle) != CS_ERR_OK)
+	if (cs_open(CS_ARCH_X86, binary->bits == 64 ? CS_MODE_64 : CS_MODE_32, &handle) != CS_ERR_OK)
 		error("Failed to disassemble binary\n");
 
 	count = cs_disasm(

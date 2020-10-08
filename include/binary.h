@@ -6,7 +6,7 @@
 struct Binary {
 
 	char *file;
-	enum Format {Auto = 0, Elf = 1, Pe = 2} format;
+	enum Format {Elf = 1} format;
 	char *printable_format;
 	enum Architecture {X86 = 1} architecture;
 	char const *printable_architecture;

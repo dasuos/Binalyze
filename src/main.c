@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
 	if (linear_disassembly_set) {
 		section_count = parsed_sections(handle, &sections);
 		print_linear_disassembly(
+			parsed_binary(handle, binary),
 			sections, 
 			section_count
 		);

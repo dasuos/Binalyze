@@ -20,9 +20,6 @@ struct Binary *parsed_binary(bfd *handle, char *file) {
 	case bfd_target_elf_flavour:
 		binary->format = Elf;
 		break;
-	case bfd_target_coff_flavour:
-		binary->format = Pe;
-		break;
 	case bfd_target_unknown_flavour:
 	default:
 		error("Unknown binary type\n");
@@ -48,8 +45,8 @@ struct Binary *parsed_binary(bfd *handle, char *file) {
 }
 
 void print_binary(struct Binary *binary) {
-	printf("Entry point address: 0x%016jx\n", binary->entry);
-	printf("Binary format:       %s\n", binary->printable_format);
-	printf("Binary architecture: %s\n", binary->printable_architecture);
+	printf("Entry point address:   %jx\n", binary->entry);
+	printf("Binary format:         %s\n", binary->printable_format);
+	printf("Binary architecture:   %s\n", binary->printable_architecture);
 }
 

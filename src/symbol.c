@@ -113,7 +113,7 @@ void print_symbols(
 			}
 
 			printf(
-				"    %-40s 0x%016jx %s\n", 
+				"    %-40s %-8jx %s\n", 
 				symbols[i].name,
 				symbols[i].address,
 				symbol_type

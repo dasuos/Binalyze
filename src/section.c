@@ -93,7 +93,7 @@ void print_sections(struct Section *sections, long count) {
 		printf("Sections:\n");
 		for (long i = 0; i < count; i++)
 			printf(
-				"    %-40s 0x%016jx %s %-8ju\n",
+				"    %-40s %-8jx %s %-8ju\n",
 				sections[i].name,
 				sections[i].virtual_address,
 				sections[i].type == Data ? "Data" : "Code",
