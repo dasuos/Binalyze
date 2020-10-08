@@ -1,2 +1,2 @@
 # Binalyze
-Experimental binary loader using libbfd API
+Binary analysis tool using libbfd and Capstone API

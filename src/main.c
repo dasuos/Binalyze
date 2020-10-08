@@ -10,6 +10,7 @@
 #include "handle.h"
 #include "symbol.h"
 #include "section.h"
+#include "disassembly.h"
 
 int main(int argc, char *argv[]) {
 
@@ -20,13 +21,14 @@ int main(int argc, char *argv[]) {
 	     symbols_set,
 	     dynamic_symbols_set, 
 	     sections_set,
-	     section_content_set = false;
+	     section_content_set = false,
+	     linear_disassembly_set;
 
 	struct Symbol *symbols = NULL;
 	struct Section *sections = NULL;
 	long symbol_count, section_count;
 
-	while ((option = getopt(argc, argv, ":f:c:ods")) != -1) {
+	while ((option = getopt(argc, argv, ":f:c:odsl")) != -1) {
 		switch (option) {
 		case 'f':
 			binary = optarg;
@@ -44,6 +46,9 @@ int main(int argc, char *argv[]) {
 		case 'c':
 			section = optarg;
 			section_content_set = true;
+			break;
+		case 'l':
+			linear_disassembly_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -68,6 +73,17 @@ int main(int argc, char *argv[]) {
 
 	bfd *handle = validated_handle(raw_handle(binary));
 
+	if (linear_disassembly_set) {
+		
+		section_count = parsed_sections(handle, &sections);
+		print_linear_disassembly(
+			sections, 
+			section_count
+		);
+
+		exit(EXIT_SUCCESS);
+	}
+
 	if (section_content_set) {
 		section_count = parsed_sections(handle, &sections);
 		print_section(
@@ -77,6 +93,7 @@ int main(int argc, char *argv[]) {
 				section
 			)
 		);
+
 		exit(EXIT_SUCCESS);
 	}
 

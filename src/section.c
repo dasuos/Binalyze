@@ -128,7 +128,7 @@ void print_section(struct Section section) {
 	int j;
 
 	printf(
-		"%s 0x%016jx %s %ju\n",
+		"%s 0x%08jx %s %ju\n",
 		section.name,
 		section.virtual_address,
 		section.type == Data ? "Data" : "Code",
@@ -143,7 +143,7 @@ void print_section(struct Section section) {
 				print_ascii(section.contents[j]);
 		//print line address
 		if ((i % 16) == 0) {
-			printf("\n%08jx: ", address);
+			printf("\n%-8jx", address);
 			address += 16;		
 		}
 		//print hexadecimal characters

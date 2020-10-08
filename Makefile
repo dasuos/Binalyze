@@ -1,5 +1,5 @@
 all:
-	@gcc -Wall -ggdb -I./include -o binalyze src/*.c -lbfd
+	@gcc -Wall -ggdb -I./include -o binalyze src/*.c -lbfd -lcapstone
 
 .PHONY: clean
 clean:
