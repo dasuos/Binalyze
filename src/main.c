@@ -74,7 +74,6 @@ int main(int argc, char *argv[]) {
 	bfd *handle = validated_handle(raw_handle(binary));
 
 	if (linear_disassembly_set) {
-		
 		section_count = parsed_sections(handle, &sections);
 		print_linear_disassembly(
 			sections, 
