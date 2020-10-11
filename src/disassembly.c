@@ -168,9 +168,8 @@ void print_recursive_disassembly(
 	while (!entries_empty()) {
 
 		entry = pop_entry();
-		
 		if (!entry_examined(entry)) {
-			
+
 			//disassemble and print instructions recursively
 			offset = entry - text.virtual_address;
 			code = text.contents + offset;
@@ -181,7 +180,6 @@ void print_recursive_disassembly(
 
 					examine_entry(entry);
 					print_instruction(instruction, 10);
-					
 					/*
 					 * add control flow targets and skip
 					 * unconditional flows and halt
