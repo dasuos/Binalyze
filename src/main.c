@@ -22,13 +22,14 @@ int main(int argc, char *argv[]) {
 	     dynamic_symbols_set, 
 	     sections_set,
 	     section_content_set = false,
-	     linear_disassembly_set;
+	     linear_disassembly_set,
+	     recursive_disassembly_set;
 
 	struct Symbol *symbols = NULL;
 	struct Section *sections = NULL;
 	long symbol_count, section_count;
 
-	while ((option = getopt(argc, argv, ":f:c:odsl")) != -1) {
+	while ((option = getopt(argc, argv, ":f:c:odslr")) != -1) {
 		switch (option) {
 		case 'f':
 			binary = optarg;
@@ -49,6 +50,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'l':
 			linear_disassembly_set = true;
+			break;
+		case 'r':
+			recursive_disassembly_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -79,6 +83,20 @@ int main(int argc, char *argv[]) {
 			parsed_binary(handle, binary),
 			sections, 
 			section_count
+		);
+
+		exit(EXIT_SUCCESS);
+	}
+
+	if (recursive_disassembly_set) {
+		section_count = parsed_sections(handle, &sections);
+		symbol_count = parsed_symbols(handle, &symbols, Static);
+		print_recursive_disassembly(
+			parsed_binary(handle, binary),
+			sections,
+			symbols,
+			section_count,
+			symbol_count
 		);
 
 		exit(EXIT_SUCCESS);

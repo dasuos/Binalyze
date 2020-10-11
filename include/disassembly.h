@@ -11,6 +11,13 @@ void print_linear_disassembly(
 	struct Section *sections, 
 	long section_count
 );
+void print_recursive_disassembly(
+	struct Binary *binary,
+	struct Section *sections,
+	struct Symbol *symbols,
+	long section_count,
+	long symbol_count
+);
 
 #endif
 
