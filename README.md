@@ -8,4 +8,5 @@ Usage: **./binalyze -f binary [-c section] [-odsl]**
 **-o** : prints static symbols  
 **-d** : prints dynamic symbols  
 **-s** : prints sections  
-**-l** : disassembles code using linear disassembly  
+**-l** : disassembles code with linear disassembly  
+**-r** : disassembles code with recursive disassembly  
