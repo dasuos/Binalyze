@@ -198,7 +198,6 @@ void print_recursive_disassembly(
 								break;
 					}
 				}
-
 			}
 			printf("__________\n\n");
 		}
