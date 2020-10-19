@@ -56,7 +56,7 @@ static bool is_control_flow(cs_insn *instruction) {
 		case CS_GRP_CALL:
 		case CS_GRP_RET:
 		case CS_GRP_IRET:
-			return true;;
+			return true;
 		}
 	return false;
 }
@@ -84,7 +84,7 @@ static uint64_t control_flow_target(cs_insn *instruction) {
 	cs_x86_op *operand;
 
 	if (is_control_flow(instruction)) {
-		for (int i = 0; i < instruction->detail->x86.op_count; i++) {
+		for (size_t i = 0; i < instruction->detail->x86.op_count; i++) {
 			operand = &instruction->detail->x86.operands[i];
 			if (operand->type == X86_OP_IMM)
 				return operand->imm;
@@ -195,7 +195,7 @@ void print_recursive_disassembly(
 							printf("\nTarget examined at adress %jx\n\n", target);
 						}
 						if (is_unconditional_flow(instruction))
-								break;
+							break;
 					}
 				}
 			}
