@@ -21,7 +21,7 @@ void push_entry(uint64_t address) {
 		entries.rear = entry;
 	} else {
 		entries.rear->next = entry;
-		entries.rear = entries.rear->next;
+		entries.rear = entry;
 	}
 }
 
@@ -32,11 +32,14 @@ uint64_t pop_entry() {
 	
 	//pop entry and save entry address
 	struct Entry *entry  = entries.front;
+	
 	entries.front = entries.front->next;
+	if (entries.front == NULL)
+		entries.rear = NULL;
 	uint64_t address = entry->address;
 
 	free(entry);
-
+	
 	return address;
 }
 
@@ -47,26 +50,30 @@ bool entries_empty() {
 
 void examine_entry(uint64_t address) {
         
-	if (seen_entries.list != NULL) {
-		if (seen_entries.count == seen_entries.size) {
-			seen_entries.size *= 2;
-			seen_entries.list = realloc(
-				seen_entries.list,
-				seen_entries.size * sizeof(uint64_t)
-			);
-		}
-		seen_entries.list[seen_entries.count++] = address;
-	} else {
-		seen_entries.list = malloc(sizeof(uint64_t));
-		seen_entries.count = 0;
+	if (seen_entries.count == 0) {
+		
 		seen_entries.size = 1;
+		seen_entries.list = malloc(sizeof(uint64_t));
+		if (seen_entries.list == NULL)
+			error("No memory can be allocated\n");
+	
+	} else if (seen_entries.size == seen_entries.count) {
+		
+		seen_entries.size *= 2;
+		seen_entries.list = realloc(
+			seen_entries.list,
+			seen_entries.size * sizeof(uint64_t)
+		);
+		if (seen_entries.list == NULL)
+			error("No memory can be allocated\n");
 	}
+	seen_entries.list[seen_entries.count++] = address;
 }
 
 bool entry_examined(uint64_t address) {
 
-	if (seen_entries.list != NULL)
-		for (size_t i = 0; i < seen_entries.count; i++)
+	if (seen_entries.count > 0)
+		for (size_t i = 0; i <= seen_entries.count; i++)
 			if (seen_entries.list[i] == address)
 				return true;
 	return false;

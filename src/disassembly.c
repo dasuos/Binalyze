@@ -44,8 +44,14 @@ static void print_instructions(cs_insn *instructions, size_t count) {
 		print_instruction(&instructions[i], length + 1);
 }
 
+static bool text_contains(struct Section text, uint64_t address) {
+	return (text.virtual_address <= address) && 
+		(address <= text.virtual_address + text.size);
+}
+
 static bool is_valid_instruction(cs_insn *instruction) {
-	return instruction->id != X86_INS_INVALID && instruction-> size > 0;
+	return (instruction->id != X86_INS_INVALID) && 
+		(instruction->size != 0);
 }
 
 static bool is_control_flow(cs_insn *instruction) {
@@ -139,6 +145,7 @@ void print_recursive_disassembly(
 	uint64_t entry, target, offset;
 	const uint8_t *code;
 	size_t code_size;
+	bool disassembled;
 
 	//open Capstone instance with detailed disassemble mode
 	open(binary, &handle);
@@ -158,16 +165,17 @@ void print_recursive_disassembly(
 	}
 
 	//add main entry point
-	push_entry(binary->entry);
+	if (text_contains(text, binary->entry))
+		push_entry(binary->entry);
 
 	//add function symbol entry points
 	for (long i = 0; i < symbol_count; i++)
-		if (symbols[i].type == Function)
+		if (symbols[i].type == Function && text_contains(text, symbols[i].address))
 			push_entry(symbols[i].address);
 
 	while (!entries_empty()) {
-
 		entry = pop_entry();
+
 		if (!entry_examined(entry)) {
 
 			//disassemble and print instructions recursively
@@ -175,31 +183,32 @@ void print_recursive_disassembly(
 			code = text.contents + offset;
 			code_size = text.size - offset;
 
-			while (cs_disasm_iter(handle, &code, &code_size, &entry, instruction)) {
+			disassembled = false;
+			while ((disassembled = cs_disasm_iter(handle, &code, &code_size, &entry, instruction))) {
 				if (is_valid_instruction(instruction)) {
 
 					examine_entry(entry);
-					print_instruction(instruction, 10);
+					print_instruction(instruction, 15);
 					/*
-					 * add control flow targets and skip
-					 * unconditional flows and halt
+					 * add control flow targets and skip					 	* unconditional flows and halt
 					 */
-					if (is_halt(instruction))
-						break;
 					if (is_control_flow(instruction)) {
 						target = control_flow_target(
 							instruction
 						);
-						if (target && !entry_examined(target)) {
+						if (target && !entry_examined(target && text_contains(text, target))) {
 							push_entry(target);
-							printf("\nTarget examined at adress %jx\n\n", target);
+							printf("\nTarget examined at address %jx\n\n", target);
 						}
 						if (is_unconditional_flow(instruction))
 							break;
 					}
+					if (is_halt(instruction))
+						break;
 				}
 			}
-			printf("__________\n\n");
+			if (disassembled)
+				printf("__________\n\n");
 		}
 	}
 }
