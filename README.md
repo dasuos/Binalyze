@@ -2,7 +2,7 @@
 Binary analysis tool using libbfd and Capstone API version 4.0.2  
 (https://www.capstone-engine.org/)
 
-Usage: **./binalyze -f binary [-c section] [-odsl]**
+Usage: **./binalyze -f binary [-c section] [-odslr]**
 
 **-c** : prints section information and content in hexadecimal and ASCII format  
 **-o** : prints static symbols  
