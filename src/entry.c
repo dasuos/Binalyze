@@ -73,7 +73,7 @@ void examine_entry(uint64_t address) {
 bool entry_examined(uint64_t address) {
 
 	if (seen_entries.count > 0)
-		for (size_t i = 0; i <= seen_entries.count; i++)
+		for (size_t i = 0; i < seen_entries.count; i++)
 			if (seen_entries.list[i] == address)
 				return true;
 	return false;

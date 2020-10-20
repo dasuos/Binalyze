@@ -145,7 +145,6 @@ void print_recursive_disassembly(
 	uint64_t entry, target, offset;
 	const uint8_t *code;
 	size_t code_size;
-	bool disassembled;
 
 	//open Capstone instance with detailed disassemble mode
 	open(binary, &handle);
@@ -183,8 +182,7 @@ void print_recursive_disassembly(
 			code = text.contents + offset;
 			code_size = text.size - offset;
 
-			disassembled = false;
-			while ((disassembled = cs_disasm_iter(handle, &code, &code_size, &entry, instruction))) {
+			while (cs_disasm_iter(handle, &code, &code_size, &entry, instruction)) {
 				if (is_valid_instruction(instruction)) {
 
 					examine_entry(entry);
@@ -193,23 +191,22 @@ void print_recursive_disassembly(
 					 * add control flow targets and skip
 					 * unconditional flows and halt
 					 */
+					if (is_halt(instruction))
+						break;
 					if (is_control_flow(instruction)) {
 						target = control_flow_target(
 							instruction
 						);
-						if (target && !entry_examined(target && text_contains(text, target))) {
+						if (target && !entry_examined(target) && text_contains(text, target)) {
 							push_entry(target);
 							printf("\nTarget examined at address %jx\n\n", target);
 						}
 						if (is_unconditional_flow(instruction))
 							break;
 					}
-					if (is_halt(instruction))
-						break;
 				}
 			}
-			if (disassembled)
-				printf("__________\n\n");
+			printf("__________\n\n");
 		}
 	}
 }
