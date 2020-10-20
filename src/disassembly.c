@@ -15,6 +15,43 @@ static void open(struct Binary *binary, csh *handle) {
 		error("Failed to disassemble binary\n");
 }
 
+static size_t disassemble_linearly(
+	csh handle, 
+	struct Section text,
+	cs_insn **instructions
+) {
+
+	return cs_disasm(
+		handle,
+		text.contents,
+		text.size,
+		text.virtual_address,
+		0,
+		instructions
+	);
+}
+
+static bool disassemble_recursively(
+        csh handle,
+        struct Section text,
+        uint64_t *entry,
+        cs_insn *instruction
+) {
+
+	uint64_t offset = *entry - text.virtual_address;
+	const uint8_t *code = text.contents + offset;
+	size_t code_size = text.size - offset;
+
+	return cs_disasm_iter(
+		handle,
+		&code,
+		&code_size,
+		entry,
+		instruction
+	);
+}
+
+
 static void print_instruction(cs_insn *instruction, size_t length) {
 
 	//print single instruction
@@ -111,22 +148,13 @@ void print_linear_disassembly(
 	//open Capstone instance
 	open(binary, &handle);
 
-	//get .text section
-	struct Section text = parsed_section(
-		sections,
-		section_count, 
-		".text"
-	);
-
-	//disassemble and print instructions
-	size_t count = cs_disasm(
+	//get .text section, disassemble and print instructions linearly
+	size_t count = disassemble_linearly(
 		handle,
-		text.contents,
-		text.size,
-		text.virtual_address,
-		0,
+		parsed_section(sections, section_count, ".text"),
 		&instructions
 	);
+
 	if (count <= 0)
 		error("Failed to disassemble binary\n");
 	print_instructions(instructions, count);
@@ -142,9 +170,7 @@ void print_recursive_disassembly(
 	
 	csh handle;
 	cs_insn *instruction;
-	uint64_t entry, target, offset;
-	const uint8_t *code;
-	size_t code_size;
+	uint64_t entry, target;
 
 	//open Capstone instance with detailed disassemble mode
 	open(binary, &handle);
@@ -178,11 +204,7 @@ void print_recursive_disassembly(
 		if (!entry_examined(entry)) {
 
 			//disassemble and print instructions recursively
-			offset = entry - text.virtual_address;
-			code = text.contents + offset;
-			code_size = text.size - offset;
-
-			while (cs_disasm_iter(handle, &code, &code_size, &entry, instruction)) {
+			while (disassemble_recursively(handle, text, &entry, instruction)) {
 				if (is_valid_instruction(instruction)) {
 
 					examine_entry(entry);
