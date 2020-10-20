@@ -190,7 +190,8 @@ void print_recursive_disassembly(
 					examine_entry(entry);
 					print_instruction(instruction, 15);
 					/*
-					 * add control flow targets and skip					 	* unconditional flows and halt
+					 * add control flow targets and skip
+					 * unconditional flows and halt
 					 */
 					if (is_control_flow(instruction)) {
 						target = control_flow_target(
