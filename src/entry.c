@@ -44,7 +44,6 @@ uint64_t pop_entry() {
 }
 
 bool entries_empty() {
-
 	return entries.front == NULL;
 }
 
@@ -54,8 +53,6 @@ void examine_entry(uint64_t address) {
 		
 		seen_entries.size = 1;
 		seen_entries.list = malloc(sizeof(uint64_t));
-		if (seen_entries.list == NULL)
-			error("No memory can be allocated\n");
 	
 	} else if (seen_entries.size == seen_entries.count) {
 		
@@ -64,9 +61,10 @@ void examine_entry(uint64_t address) {
 			seen_entries.list,
 			seen_entries.size * sizeof(uint64_t)
 		);
-		if (seen_entries.list == NULL)
-			error("No memory can be allocated\n");
 	}
+	if (seen_entries.list == NULL)
+		error("No memory can be allocated\n");
+
 	seen_entries.list[seen_entries.count++] = address;
 }
 

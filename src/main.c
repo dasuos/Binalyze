@@ -11,6 +11,7 @@
 #include "symbol.h"
 #include "section.h"
 #include "disassembly.h"
+#include "gadget.h"
 
 int main(int argc, char *argv[]) {
 
@@ -21,15 +22,18 @@ int main(int argc, char *argv[]) {
 	     symbols_set,
 	     dynamic_symbols_set, 
 	     sections_set,
-	     section_content_set = false,
+	     section_content_set,
 	     linear_disassembly_set,
-	     recursive_disassembly_set;
+	     recursive_disassembly_set,
+	     gadget_scan_set = false;
+		
 
 	struct Symbol *symbols = NULL;
 	struct Section *sections = NULL;
-	long symbol_count, section_count;
+	long symbol_count, 
+	     section_count;
 
-	while ((option = getopt(argc, argv, ":f:c:odslr")) != -1) {
+	while ((option = getopt(argc, argv, ":f:c:odslrg")) != -1) {
 		switch (option) {
 		case 'f':
 			binary = optarg;
@@ -53,6 +57,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'r':
 			recursive_disassembly_set = true;
+			break;
+		case 'g':
+			gadget_scan_set = true;
 			break;
 		case ':':
 			fprintf(
@@ -100,6 +107,17 @@ int main(int argc, char *argv[]) {
 		);
 
 		exit(EXIT_SUCCESS);
+	}
+
+	if (gadget_scan_set) {
+		section_count = parsed_sections(handle, &sections);
+		print_gadgets(
+			parsed_binary(handle, binary),
+			sections,
+			section_count
+		);
+
+		exit(EXIT_SUCCESS);	
 	}
 
 	if (section_content_set) {

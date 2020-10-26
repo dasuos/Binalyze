@@ -4,6 +4,7 @@
 #include <bfd.h>
 
 bfd *raw_handle(char *file);
+
 bfd *validated_handle(bfd *handle);
 
 #endif

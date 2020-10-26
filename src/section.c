@@ -8,11 +8,11 @@
 #include "section.h"
 #include "general.h"
 
-static void print_ascii(char character) {
+void print_ascii(char character) {
         printf("%c", character >= ' ' && character <= '~' ? character : '.');
 }
 
-static void print_padding(int64_t size) {
+void print_padding(int64_t size) {
 	
 	if (size % 16 != 0) {	
 		for (int i = 0; i < (16 - (size % 16)); i++) {
@@ -89,6 +89,7 @@ long parsed_sections(bfd *handle, struct Section **reference) {
 }
 
 void print_sections(struct Section *sections, long count) {
+
 	if (count > 0) {
 		printf("Sections:\n");
 		for (long i = 0; i < count; i++)

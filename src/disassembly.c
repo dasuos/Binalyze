@@ -8,14 +8,14 @@
 #include "symbol.h"
 #include "entry.h"
 
-static void open(struct Binary *binary, csh *handle) {
+void open(struct Binary *binary, csh *handle) {
 
 	//open Capstone instance
 	if (cs_open(CS_ARCH_X86, binary->bits == 64 ? CS_MODE_64 : CS_MODE_32, handle) != CS_ERR_OK)
 		error("Failed to disassemble binary\n");
 }
 
-static size_t disassemble_linearly(
+size_t disassemble_linearly(
 	csh handle, 
 	struct Section text,
 	cs_insn **instructions
@@ -31,7 +31,7 @@ static size_t disassemble_linearly(
 	);
 }
 
-static bool disassemble_recursively(
+bool disassemble_recursively(
         csh handle,
         struct Section text,
         uint64_t *entry,
@@ -52,7 +52,7 @@ static bool disassemble_recursively(
 }
 
 
-static void print_instruction(cs_insn *instruction, size_t length) {
+void print_instruction(cs_insn *instruction, size_t length) {
 
 	//print single instruction
 	printf("%-8jx", instruction->address);
@@ -68,7 +68,7 @@ static void print_instruction(cs_insn *instruction, size_t length) {
 		);
 }
 
-static void print_instructions(cs_insn *instructions, size_t count) {
+void print_instructions(cs_insn *instructions, size_t count) {
 
 	//set maximum instruction length
 	size_t length = 0;
@@ -81,17 +81,17 @@ static void print_instructions(cs_insn *instructions, size_t count) {
 		print_instruction(&instructions[i], length + 1);
 }
 
-static bool text_contains(struct Section text, uint64_t address) {
+bool text_contains(struct Section text, uint64_t address) {
 	return (text.virtual_address <= address) && 
 		(address <= text.virtual_address + text.size);
 }
 
-static bool is_valid_instruction(cs_insn *instruction) {
+bool is_valid_instruction(cs_insn *instruction) {
 	return (instruction->id != X86_INS_INVALID) && 
 		(instruction->size != 0);
 }
 
-static bool is_control_flow(cs_insn *instruction) {
+bool is_control_flow(cs_insn *instruction) {
 
 	for (size_t i = 0; i < instruction->detail->groups_count; i++)
 		switch (instruction->detail->groups[i]) {
@@ -104,7 +104,7 @@ static bool is_control_flow(cs_insn *instruction) {
 	return false;
 }
 
-static bool is_unconditional_flow(cs_insn *instruction) {
+bool is_unconditional_flow(cs_insn *instruction) {
 	
 	switch(instruction->id) {
 	case X86_INS_JMP:
@@ -118,11 +118,11 @@ static bool is_unconditional_flow(cs_insn *instruction) {
 	}
 }
 
-static bool is_halt(cs_insn *instruction) {
+bool is_halt(cs_insn *instruction) {
 	return instruction->id == X86_INS_HLT;
 }
 
-static uint64_t control_flow_target(cs_insn *instruction) {
+uint64_t control_flow_target(cs_insn *instruction) {
 	
 	cs_x86_op *operand;
 

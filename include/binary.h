@@ -15,6 +15,7 @@ struct Binary {
 };
 
 struct Binary *parsed_binary(bfd *handle, char *file);
+
 void print_binary(struct Binary *binary);
 
 #endif

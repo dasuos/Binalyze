@@ -6,7 +6,7 @@
 #include "symbol.h"
 #include "general.h"
 
-static int upper_bound(bfd *handle, enum SymbolTable table_type) {
+int upper_bound(bfd *handle, enum SymbolTable table_type) {
 	switch(table_type) {
 	case Static:
 		return bfd_get_symtab_upper_bound(handle);
@@ -17,7 +17,7 @@ static int upper_bound(bfd *handle, enum SymbolTable table_type) {
 	}
 }
 
-static long canonicalize(
+long canonicalize(
 	bfd *handle, 
 	asymbol **table, 
 	enum SymbolTable table_type

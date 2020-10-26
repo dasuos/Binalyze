@@ -14,13 +14,20 @@ struct Section {
 	uint8_t *contents;
 };
 
+void print_ascii(char character);
+
+void print_padding(int64_t size);
+
 long parsed_sections(bfd *handle, struct Section **reference);
+
 void print_sections(struct Section *sections, long count);
+
 struct Section parsed_section(
 	struct Section *sections, 
 	long count,
 	char *name
 );
+
 void print_section(struct Section section);
 
 #endif

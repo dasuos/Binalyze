@@ -10,7 +10,7 @@ void error(char *message) {
 
 void usage(char *argv[]) {
 
-	fprintf(stderr, "Usage: %s -f binary [-c section] [-odslr]\n", argv[0]);
+	fprintf(stderr, "Usage: %s -f binary [-c section] [-odslrg]\n", argv[0]);
 	exit(EXIT_FAILURE);
 }
 
