@@ -30,6 +30,8 @@ bool invalid_control_flow(cs_insn *instruction);
 
 bool gadget_oversized(size_t size);
 
+char *append_instruction(char *instructions, cs_insn *instruction);
+
 size_t add_gadget(uint64_t address, char *instruction);
 
 void print_gadgets(
